@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ココフォリア デッキ作成ツール v2</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Yu Gothic",sans-serif;background:#f4f5f7;color:#222}
+header{background:#222;color:#fff;padding:18px 24px}
+header h1{margin:0;font-size:20px}
+header p{margin:5px 0 0;color:#bbb;font-size:13px}
+main{max-width:1200px;margin:20px auto;padding:0 16px}
+.panel{background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px #0000000b}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
+.field{flex:1;min-width:180px}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#555}
+input[type=text],input[type=number],input[type=file]{width:100%;padding:9px;border:1px solid #ccc;border-radius:7px;background:#fff}
+button{border:0;border-radius:8px;padding:9px 14px;cursor:pointer;font-weight:700}
+.primary{background:#222;color:#fff}.secondary{background:#e9eaed}.danger{background:#f3d4d4;color:#8a1111}
+.drop{border:2px dashed #aaa;border-radius:10px;padding:25px;text-align:center;background:#fafafa;cursor:pointer}
+.drop.drag{background:#eef3ff;border-color:#536dfe}
+.deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.card{border:1px solid #ddd;border-radius:10px;background:#fff;overflow:hidden;position:relative}
+.card img{width:100%;aspect-ratio:2/3;object-fit:contain;background:#eee;display:block}
+.card .body{padding:9px}
+.card input{margin-top:6px}
+.card .remove{position:absolute;right:7px;top:7px;padding:5px 8px;background:#fff;color:#a00;border-radius:6px}
+.preview{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.cover{width:140px}
+.cover img{width:140px;aspect-ratio:2/3;object-fit:contain;background:#eee;border:1px solid #ddd;border-radius:8px}
+.stats{font-size:13px;color:#666;margin-top:8px}
+.notice{font-size:13px;color:#555;line-height:1.7}
+@media(max-width:600px){.deck{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header>
+<h1>ココフォリア デッキ作成ツール v2</h1>
+<p>画像を登録して、ココフォリア互換のZIPデッキデータを生成します。</p>
+</header>
+
+<main>
+<section class="panel">
+  <div class="row">
+    <div class="field">
+      <label>デッキ名</label>
+      <input id="deckName" type="text" value="マイデッキ">
+    </div>
+    <div class="field">
+      <label>カード幅</label>
+      <input id="width" type="number" value="2" min="1">
+    </div>
+    <div class="field">
+      <label>カード高さ</label>
+      <input id="height" type="number" value="3" min="1">
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <label>デッキの裏面画像</label>
+  <div id="coverDrop" class="drop">ここへ画像をドラッグ＆ドロップ<br>またはクリックして選択</div>
+  <input id="coverInput" type="file" accept="image/*" hidden>
+  <div id="coverInfo" class="stats">未設定</div>
+</section>
+
+<section class="panel">
+  <label>カード画像</label>
+  <div id="cardDrop" class="drop">カード画像を複数まとめてドラッグ＆ドロップ<br>またはクリックして選択</div>
+  <input id="cardInput" type="file" accept="image/*" multiple hidden>
+  <div id="stats" class="stats">カード：0枚</div>
+</section>
+
+<section class="panel">
+  <div class="row">
+    <button class="secondary" id="sortBtn">名前順に並べ替え</button>
+    <button class="secondary" id="clearBtn">カードを全削除</button>
+    <button class="primary" id="exportBtn">ココフォリア用ZIPを書き出す</button>
+  </div>
+</section>
+
+<section class="panel">
+  <h2 style="font-size:17px;margin-top:0">カード一覧</h2>
+  <div id="cards" class="deck"></div>
+</section>
+
+<section class="panel">
+  <div class="preview">
+    <div class="cover">
+      <strong style="font-size:13px">裏面プレビュー</strong>
+      <div id="coverPreview" style="margin-top:7px"></div>
+    </div>
+    <div class="notice">
+      <strong>使い方</strong><br>
+      ① 裏面画像を設定<br>
+      ② カード画像をまとめて登録<br>
+      ③ 必要ならカードのメモを編集<br>
+      ④ ZIPを書き出す<br>
+      ⑤ 生成されたZIPをココフォリアのルームへドラッグ＆ドロップ
+    </div>
+  </div>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script>
+const cards=[];
+let cover=null;
+
+const $=id=>document.getElementById(id);
+
+function randomId(n=20){
+  const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let s="";
+  crypto.getRandomValues(new Uint32Array(n)).forEach(v=>s+=chars[v%chars.length]);
+  return s;
+}
+async function sha256(file){
+  const buf=await file.arrayBuffer();
+  const hash=await crypto.subtle.digest("SHA-256",buf);
+  return [...new Uint8Array(hash)].map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+async function addCover(file){
+  if(!file || !file.type.startsWith("image/")) return;
+  cover={file, hash:await sha256(file)};
+  $("coverInfo").textContent=file.name;
+  const url=URL.createObjectURL(file);
+  $("coverPreview").innerHTML=`<img src="${url}" style="width:140px;aspect-ratio:2/3;object-fit:contain;background:#eee;border:1px solid #ddd;border-radius:8px">`;
+}
+async function addCards(files){
+  for(const file of files){
+    if(!file.type.startsWith("image/")) continue;
+    cards.push({file, hash:await sha256(file), memo:""});
+  }
+  render();
+}
+function render(){
+  $("stats").textContent=`カード：${cards.length}枚`;
+  $("cards").innerHTML="";
+  cards.forEach((c,i)=>{
+    const el=document.createElement("div");
+    el.className="card";
+    const url=URL.createObjectURL(c.file);
+    el.innerHTML=`
+      <button class="remove" title="削除">×</button>
+      <img src="${url}">
+      <div class="body">
+        <div style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(c.file.name)}</div>
+        <input type="text" placeholder="カードメモ（任意）" value="${escapeAttr(c.memo)}">
+      </div>`;
+    el.querySelector(".remove").onclick=()=>{cards.splice(i,1);render()};
+    el.querySelector("input").oninput=e=>c.memo=e.target.value;
+    $("cards").appendChild(el);
+  });
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function escapeAttr(s){return escapeHtml(s)}
+
+function setupDrop(drop,input,handler){
+  drop.onclick=()=>input.click();
+  input.onchange=e=>handler([...e.target.files]);
+  ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));
+  ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));
+  drop.addEventListener("drop",e=>handler([...e.dataTransfer.files]));
+}
+setupDrop($("coverDrop"),$("coverInput"),files=>files[0]&&addCover(files[0]));
+setupDrop($("cardDrop"),$("cardInput"),addCards);
+
+$("sortBtn").onclick=()=>{
+  cards.sort((a,b)=>a.file.name.localeCompare(b.file.name,"ja"));
+  render();
+};
+$("clearBtn").onclick=()=>{
+  if(confirm("カードをすべて削除しますか？")){cards.length=0;render();}
+};
+
+$("exportBtn").onclick=async()=>{
+  if(!cover){alert("デッキの裏面画像を設定してください。");return}
+  if(!cards.length){alert("カード画像を1枚以上登録してください。");return}
+
+  const zip=new JSZip();
+  const resource={};
+  const deckId=randomId();
+  const deckItems={};
+
+  // ココフォリアのサンプルデータに合わせ、PNG化した実体のSHA-256をファイル名にする
+  const coverPng=await normalizePng(cover.file);
+  const coverHash=await sha256(coverPng);
+  const coverName=coverHash+".png";
+  zip.file(coverName,coverPng);
+  resource[coverName]={type:"image/png"};
+
+  for(const c of cards){
+    const png=await normalizePng(c.file);
+    const hash=await sha256(png);
+    const name=hash+".png";
+    zip.file(name,png);
+    resource[name]={type:"image/png"};
+    const itemId=randomId();
+    deckItems[itemId]={imageUrl:name,memo:c.memo||""};
+  }
+
+  const data={
+    meta:{version:"1.1.0"},
+    entities:{
+      room:{},items:{},
+      decks:{
+        [deckId]:{
+          x:-10,y:-8,z:99,
+          width:Number($("width").value)||2,
+          height:Number($("height").value)||3,
+          coverImageUrl:coverName,
+          items:deckItems
+        }
+      },
+      notes:{},characters:{},effects:{},scenes:{},savedatas:{},snapshots:{}
+    },
+    resources:resource
+  };
+
+  // __data.json はサンプルと同じく改行・インデントなしで保存
+  const dataText=JSON.stringify(data);
+  zip.file("__data.json",dataText);
+
+  // .token は「0.」+ __data.json のSHA-256
+  const tokenHash=await sha256(new Blob([dataText]));
+  zip.file(".token","0."+tokenHash);
+
+  const blob=await zip.generateAsync({type:"blob",compression:"DEFLATE"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  const safe=($("deckName").value||"my_deck").replace(/[\\/:*?"<>|]/g,"_");
+  a.download=safe+".zip";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+
+async function normalizePng(file){
+  if(file.type==="image/png") return file;
+  const bmp=await createImageBitmap(file);
+  const canvas=document.createElement("canvas");
+  canvas.width=bmp.width;canvas.height=bmp.height;
+  canvas.getContext("2d").drawImage(bmp,0,0);
+  return new Promise(r=>canvas.toBlob(r,"image/png"));
+}
+render();
+</script>
+</body>
+</html>
