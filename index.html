@@ -3,41 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ココフォリア デッキ作成ツール v2</title>
+<title>ココフォリア デッキ作成ツール - Excel選択式</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,"Yu Gothic",sans-serif;background:#f4f5f7;color:#222}
-header{background:#222;color:#fff;padding:18px 24px}
-header h1{margin:0;font-size:20px}
-header p{margin:5px 0 0;color:#bbb;font-size:13px}
-main{max-width:1200px;margin:20px auto;padding:0 16px}
-.panel{background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px #0000000b}
-.row{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
-.field{flex:1;min-width:180px}
-label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#555}
-input[type=text],input[type=number],input[type=file]{width:100%;padding:9px;border:1px solid #ccc;border-radius:7px;background:#fff}
-button{border:0;border-radius:8px;padding:9px 14px;cursor:pointer;font-weight:700}
-.primary{background:#222;color:#fff}.secondary{background:#e9eaed}.danger{background:#f3d4d4;color:#8a1111}
-.drop{border:2px dashed #aaa;border-radius:10px;padding:25px;text-align:center;background:#fafafa;cursor:pointer}
-.drop.drag{background:#eef3ff;border-color:#536dfe}
-.deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
-.card{border:1px solid #ddd;border-radius:10px;background:#fff;overflow:hidden;position:relative}
-.card img{width:100%;aspect-ratio:2/3;object-fit:contain;background:#eee;display:block}
-.card .body{padding:9px}
-.card input{margin-top:6px}
-.card .remove{position:absolute;right:7px;top:7px;padding:5px 8px;background:#fff;color:#a00;border-radius:6px}
-.preview{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
-.cover{width:140px}
-.cover img{width:140px;aspect-ratio:2/3;object-fit:contain;background:#eee;border:1px solid #ddd;border-radius:8px}
-.stats{font-size:13px;color:#666;margin-top:8px}
-.notice{font-size:13px;color:#555;line-height:1.7}
-@media(max-width:600px){.deck{grid-template-columns:repeat(2,1fr)}}
+body{margin:0;background:#f3f4f6;color:#222;font-family:system-ui,-apple-system,"Yu Gothic",Meiryo,sans-serif}
+header{background:#222;color:#fff;padding:18px 22px}
+header h1{font-size:20px;margin:0}
+header p{font-size:13px;color:#bbb;margin:5px 0 0}
+main{max-width:1250px;margin:auto;padding:18px}
+.panel{background:#fff;border:1px solid #ddd;border-radius:12px;padding:16px;margin-bottom:14px}
+.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.field{min-width:180px;flex:1}
+label{display:block;font-size:12px;font-weight:700;color:#555;margin-bottom:5px}
+input,select,button{font:inherit}
+input[type=text],input[type=number],select{width:100%;padding:8px;border:1px solid #ccc;border-radius:7px;background:#fff}
+button{border:0;border-radius:7px;padding:9px 13px;font-weight:700;cursor:pointer}
+.primary{background:#222;color:#fff}.sub{background:#e9eaed}.danger{background:#f3d7d7;color:#8b1111}
+.status{font-size:13px;color:#666;margin-top:8px;line-height:1.6}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toolbar .search{flex:1;min-width:220px}
+.deckinfo{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:#555;margin-top:10px}
+.deckinfo b{color:#222}
+.table-wrap{overflow:auto;border:1px solid #ddd;border-radius:9px}
+table{border-collapse:collapse;width:100%;min-width:900px}
+th,td{padding:9px 10px;border-bottom:1px solid #e5e5e5;text-align:left;vertical-align:middle}
+th{background:#f7f7f8;position:sticky;top:0;z-index:2;font-size:12px}
+td{font-size:13px}
+tr.selected{background:#f5f8ff}
+.no{width:70px;text-align:center}.qty{width:80px}.pick{width:55px;text-align:center}
+.qty input{width:65px;text-align:center}
+.memo{white-space:pre-line;font-size:12px;color:#555}
+.badge{display:inline-block;border-radius:20px;padding:3px 8px;background:#eee;font-size:11px}
+.image-ok{color:#147a36}.image-ng{color:#a22}
+.preview-img{width:42px;height:62px;object-fit:contain;background:#eee;border-radius:4px;border:1px solid #ddd}
+.empty{padding:35px;text-align:center;color:#777}
+small{color:#777}
+.notice{font-size:13px;line-height:1.7;color:#555}
+@media(max-width:700px){main{padding:10px}}
 </style>
 </head>
 <body>
 <header>
-<h1>ココフォリア デッキ作成ツール v2</h1>
-<p>画像を登録して、ココフォリア互換のZIPデッキデータを生成します。</p>
+<h1>ココフォリア デッキ作成ツール</h1>
+<p>Excelのカード一覧からカードを選び、ココフォリア用ZIPデッキを作成します。</p>
 </header>
 
 <main>
@@ -45,162 +53,407 @@ button{border:0;border-radius:8px;padding:9px 14px;cursor:pointer;font-weight:70
   <div class="row">
     <div class="field">
       <label>デッキ名</label>
-      <input id="deckName" type="text" value="マイデッキ">
+      <input id="deckName" value="マイデッキ">
     </div>
     <div class="field">
-      <label>カード幅</label>
-      <input id="width" type="number" value="2" min="1">
+      <label>カード画像の検索</label>
+      <input id="imagePattern" value="カードNo">
     </div>
-    <div class="field">
-      <label>カード高さ</label>
-      <input id="height" type="number" value="3" min="1">
+    <div>
+      <button class="primary" id="folderBtn">カードフォルダを選択</button>
+    </div>
+    <div>
+      <button class="sub" id="excelBtn">Excelを選択</button>
+      <input id="excelInput" type="file" accept=".xlsx,.xls,.csv" hidden>
+    </div>
+  </div>
+  <div id="fileStatus" class="status">まずExcelを選択してください。同じフォルダにHTML・Excel・「表カード.png」「裏カード.png」「カード背面.png」を置いてください。</div>
+  <div class="status" style="margin-top:6px">
+    同じフォルダに配置：<b>HTML</b> / <b>Excel</b> / <b>表カード.png</b> / <b>裏カード.png</b> / <b>カード背面.png</b>
+  </div>
+  <input id="excelFileName" type="hidden">
+  <div id="sheetArea" style="display:none;margin-top:12px">
+    <label>読み込むシート</label>
+    <div class="row">
+      <div class="field"><select id="sheetSelect"></select></div>
+      <div><button class="primary" id="sheetLoadBtn">このシートを読み込む</button></div>
     </div>
   </div>
 </section>
 
-<section class="panel">
-  <label>デッキの裏面画像</label>
-  <div id="coverDrop" class="drop">ここへ画像をドラッグ＆ドロップ<br>またはクリックして選択</div>
-  <input id="coverInput" type="file" accept="image/*" hidden>
-  <div id="coverInfo" class="stats">未設定</div>
+<section class="panel" id="filters" style="display:none">
+  <div class="toolbar">
+    <div class="search"><input id="search" placeholder="カード名・カードNo・効果で検索"></div>
+    <div style="min-width:150px">
+      <select id="typeFilter"><option value="">カード種類：すべて</option></select>
+    </div>
+    <div style="min-width:150px">
+      <select id="sideFilter"><option value="">表/裏：すべて</option></select>
+    </div>
+    <button class="sub" id="resetBtn">選択解除</button>
+  </div>
+  <div class="deckinfo">
+    <span>カード種類数：<b id="cardCount">0</b></span>
+    <span>デッキ枚数：<b id="deckCount">0</b></span>
+    <span>選択中：<b id="selectedCount">0</b></span>
+  </div>
 </section>
 
-<section class="panel">
-  <label>カード画像</label>
-  <div id="cardDrop" class="drop">カード画像を複数まとめてドラッグ＆ドロップ<br>またはクリックして選択</div>
-  <input id="cardInput" type="file" accept="image/*" multiple hidden>
-  <div id="stats" class="stats">カード：0枚</div>
+<section class="panel" id="cardsPanel">
+  <div class="empty">Excelを読み込むとカード一覧が表示されます。</div>
 </section>
 
 <section class="panel">
   <div class="row">
-    <button class="secondary" id="sortBtn">名前順に並べ替え</button>
-    <button class="secondary" id="clearBtn">カードを全削除</button>
-    <button class="primary" id="exportBtn">ココフォリア用ZIPを書き出す</button>
-  </div>
-</section>
-
-<section class="panel">
-  <h2 style="font-size:17px;margin-top:0">カード一覧</h2>
-  <div id="cards" class="deck"></div>
-</section>
-
-<section class="panel">
-  <div class="preview">
-    <div class="cover">
-      <strong style="font-size:13px">裏面プレビュー</strong>
-      <div id="coverPreview" style="margin-top:7px"></div>
+    <div class="field">
+      <label>カード幅</label>
+      <input id="deckWidth" type="number" value="2" min="1" step="0.1">
     </div>
-    <div class="notice">
-      <strong>使い方</strong><br>
-      ① 裏面画像を設定<br>
-      ② カード画像をまとめて登録<br>
-      ③ 必要ならカードのメモを編集<br>
-      ④ ZIPを書き出す<br>
-      ⑤ 生成されたZIPをココフォリアのルームへドラッグ＆ドロップ
+    <div class="field">
+      <label>カード高さ</label>
+      <input id="deckHeight" type="number" value="3" min="1" step="0.1">
+    </div>
+    <div>
+      <button class="primary" id="exportBtn">ココフォリア用ZIPを書き出す</button>
     </div>
   </div>
+  <p class="notice">
+    カードは1種類につき<strong>最大3枚</strong>まで選択できます。<br>
+    メモは「カード名(表/裏・カード種類)」＋「効果：」＋Excelの効果欄という形式で自動生成します。
+  </p>
 </section>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
-const cards=[];
-let cover=null;
+/*
+ * カード画像の固定設定
+ * 現在は「表カード＝表カード.png」「裏カード＝裏カード.png」「カード背面＝カード背面.png」
+ * 後でここだけ変更すれば画像ファイル名を変更できます。
+ */
+const FACE_IMAGE_FILENAME = "表カード.png";
+const BACK_IMAGE_FILENAME = "裏カード.png";
+const COVER_IMAGE_FILENAME = "カード背面.png";
+
+let rows=[];
+let selected=new Map(); // index -> quantity
+let imageFiles=new Map(); // normalized filename -> File
+let directoryHandle=null;
 
 const $=id=>document.getElementById(id);
 
-function randomId(n=20){
-  const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let s="";
-  crypto.getRandomValues(new Uint32Array(n)).forEach(v=>s+=chars[v%chars.length]);
+function esc(s){
+  return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function norm(s){
+  return String(s??"").trim().toLowerCase().replace(/\\s+/g,"");
+}
+function clean(v){return v===undefined||v===null?"":String(v).trim()}
+
+function getSide(v){
+  const s=clean(v);
+  if(!s)return "";
+  if(s.includes("裏"))return "裏";
+  if(s.includes("表"))return "表";
   return s;
 }
-async function sha256(file){
+
+function makeMemo(r){
+  return `${r.name}(${r.side||"表"}・${r.kind||"未分類"})
+所属：${r.affiliation||""}
+タイプ：${r.type||""}　属性：${r.attribute||""}
+コスト：${r.cost||""}　リンク/パス：${r.link||""}　パワー：${r.power||""}
+～効果～
+${r.effect||""}`;
+}
+
+function imageCandidates(no){
+  const n=clean(no);
+  return [
+    `${n}.png`,`${n}.jpg`,`${n}.jpeg`,`${n}.webp`,
+    `カード${n}.png`,`カード${n}.jpg`,`カード${n}.jpeg`,`カード${n}.webp`,
+    `card${n}.png`,`card${n}.jpg`,`card${n}.jpeg`,`card${n}.webp`,
+    `card_${n}.png`,`card_${n}.jpg`,`card_${n}.jpeg`,`card_${n}.webp`
+  ].map(norm);
+}
+
+async function scanDirectory(handle){
+  imageFiles.clear();
+  let excelFound=null;
+  let excelPath="";
+
+  async function walk(dir, path=""){
+    for await(const [name,h] of dir.entries()){
+      const currentPath=path ? path+"/"+name : name;
+      if(h.kind==="directory"){
+        await walk(h,currentPath);
+      }else{
+        const lower=name.toLowerCase();
+
+        if(/\.(xlsx|xls|xlsm|csv)$/.test(lower) && !excelFound){
+          excelFound=h;
+          excelPath=currentPath;
+        }
+
+        if(/\.(png|jpg|jpeg|webp)$/.test(lower)){
+          const file=await h.getFile();
+          imageFiles.set(norm(name),file);
+          imageFiles.set(norm(currentPath),file);
+        }
+      }
+    }
+  }
+
+  await walk(handle);
+
+  if(!excelFound){
+    throw new Error(
+      "選択したフォルダ内にExcelが見つかりませんでした。\n"+
+      "対応形式：.xlsx / .xls / .xlsm / .csv\n"+
+      "サブフォルダ内も検索しています。"
+    );
+  }
+
+  const file=await excelFound.getFile();
+  $("excelFileName").value=file.name;
+  await loadExcel(file);
+  matchImages();
+
+  $("fileStatus").innerHTML=
+    `フォルダ：<b>${esc(handle.name)}</b><br>`+
+    `Excel：<b>${esc(excelPath)}</b><br>`+
+    `固定画像：表カード＝<b>${esc(FACE_IMAGE_FILENAME)}</b> / 裏カード＝<b>${esc(BACK_IMAGE_FILENAME)}</b> / カード背面＝<b>${esc(COVER_IMAGE_FILENAME)}</b>`;
+}
+
+let workbook=null;
+
+async function loadExcel(file,sheetName=null){
   const buf=await file.arrayBuffer();
+  workbook=XLSX.read(buf,{type:"array",cellDates:true});
+  if(!workbook.SheetNames?.length) throw new Error("Excelにワークシートがありません。");
+  const chosen=sheetName&&workbook.SheetNames.includes(sheetName)?sheetName:workbook.SheetNames[0];
+
+  $("sheetSelect").innerHTML=workbook.SheetNames.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join("");
+  $("sheetSelect").value=chosen;
+  $("sheetArea").style.display="";
+  loadSelectedSheet(chosen);
+}
+
+function loadSelectedSheet(sheetName){
+  const ws=workbook.Sheets[sheetName];
+  if(!ws) throw new Error(`シート「${sheetName}」が見つかりません。`);
+  const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:false});
+  if(!data.length) throw new Error(`シート「${sheetName}」が空です。`);
+
+  rows=[];
+  for(let i=1;i<data.length;i++){
+    const r=data[i]||[];
+    if(r.every(v=>clean(v)==="")) continue;
+    rows.push({
+      no:clean(r[0]), name:clean(r[1]), kind:clean(r[2]), side:getSide(r[3]),
+      affiliation:clean(r[4]), type:clean(r[5]), attribute:clean(r[6]),
+      cost:clean(r[7]), link:clean(r[8]), power:clean(r[9]), effect:clean(r[10]),
+      image:null, rowIndex:i+1
+    });
+  }
+  selected.clear();
+  buildFilters();
+  render();
+  matchImages();
+  $("fileStatus").innerHTML=`Excel：<b>${esc($("excelFileName").value)}</b> / シート：<b>${esc(sheetName)}</b> / カード：<b>${rows.length}</b>種類`;
+}
+
+function matchImages(){
+  rows.forEach(r=>{
+    r.image=null;
+    const filename = r.side==="裏" ? BACK_IMAGE_FILENAME : FACE_IMAGE_FILENAME;
+    r.image=imageFiles.get(norm(filename)) || null;
+  });
+  render();
+}
+function buildFilters(){
+  const types=[...new Set(rows.map(r=>r.kind).filter(Boolean))];
+  const sides=[...new Set(rows.map(r=>r.side).filter(Boolean))];
+  $("typeFilter").innerHTML='<option value="">カード種類：すべて</option>'+types.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  $("sideFilter").innerHTML='<option value="">表/裏：すべて</option>'+sides.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  $("filters").style.display="";
+  $("cardCount").textContent=rows.length;
+}
+
+function filteredRows(){
+  const q=norm($("search").value);
+  const type=$("typeFilter").value;
+  const side=$("sideFilter").value;
+  return rows.map((r,i)=>({r,i})).filter(({r})=>{
+    if(type&&r.kind!==type)return false;
+    if(side&&r.side!==side)return false;
+    if(q){
+      const all=norm(`${r.no} ${r.name} ${r.kind} ${r.side} ${r.affiliation} ${r.type} ${r.attribute} ${r.cost} ${r.link} ${r.power} ${r.effect}`);
+      if(!all.includes(q))return false;
+    }
+    return true;
+  });
+}
+
+function render(){
+  if(!rows.length){
+    $("cardsPanel").innerHTML='<div class="empty">Excelを読み込むとカード一覧が表示されます。</div>';
+    return;
+  }
+  const list=filteredRows();
+  let html=`<div class="table-wrap"><table>
+  <thead><tr>
+  <th class="pick">選択</th><th class="no">カードNo</th><th>カード名</th><th>カード種類</th><th>表/裏</th><th>所属</th><th>タイプ</th><th>属性</th><th>コスト</th><th>リンク/パス</th><th>パワー</th><th>効果</th><th>画像</th><th class="qty">枚数</th><th>メモ</th>
+  </tr></thead><tbody>`;
+
+  for(const {r,i} of list){
+    const qty=selected.get(i)||0;
+    const img=r.image?`<img class="preview-img" src="${URL.createObjectURL(r.image)}">`:`<span class="image-ng">なし</span>`;
+    html+=`<tr class="${qty?"selected":""}">
+      <td class="pick"><input type="checkbox" data-pick="${i}" ${qty?"checked":""}></td>
+      <td class="no">${esc(r.no)}</td>
+      <td><b>${esc(r.name)}</b></td>
+      <td><span class="badge">${esc(r.kind)}</span></td>
+      <td>${esc(r.side)}</td>
+      <td>${esc(r.affiliation)}</td>
+      <td>${esc(r.type)}</td>
+      <td>${esc(r.attribute)}</td>
+      <td>${esc(r.cost)}</td>
+      <td>${esc(r.link)}</td>
+      <td>${esc(r.power)}</td>
+      <td>${esc(r.effect).replace(/\\n/g,"<br>")}</td>
+      <td>${img}</td>
+      <td class="qty"><input type="number" min="0" max="3" value="${qty}" data-qty="${i}"></td>
+      <td class="memo">${esc(makeMemo(r)).replace(/\\n/g,"<br>")}</td>
+    </tr>`;
+  }
+  html+=`</tbody></table></div>`;
+  if(!list.length)html='<div class="empty">条件に一致するカードがありません。</div>';
+  $("cardsPanel").innerHTML=html;
+
+  $("cardsPanel").querySelectorAll("[data-pick]").forEach(el=>{
+    el.onchange=()=>{
+      const i=Number(el.dataset.pick);
+      if(el.checked)selected.set(i,Math.max(1,selected.get(i)||1));
+      else selected.delete(i);
+      render(); updateStats();
+    };
+  });
+  $("cardsPanel").querySelectorAll("[data-qty]").forEach(el=>{
+    el.onchange=()=>{
+      const i=Number(el.dataset.qty);
+      let q=Math.max(0,Math.min(3,Number(el.value)||0));
+      if(q)selected.set(i,q);else selected.delete(i);
+      render(); updateStats();
+    };
+  });
+  updateStats();
+}
+
+function updateStats(){
+  let total=0;
+  for(const q of selected.values())total+=q;
+  $("deckCount").textContent=total;
+  $("selectedCount").textContent=selected.size;
+}
+
+$("search").oninput=render;
+$("typeFilter").onchange=render;
+$("sideFilter").onchange=render;
+$("sheetLoadBtn").onclick=()=>{
+  try{loadSelectedSheet($("sheetSelect").value)}
+  catch(e){alert(e.message||e)}
+};
+
+$("resetBtn").onclick=()=>{selected.clear();render()};
+
+$("excelBtn").onclick=()=>$("excelInput").click();
+$("excelInput").onchange=async e=>{
+  try{
+    $("excelFileName").value=e.target.files[0].name;
+    await loadExcel(e.target.files[0]);
+  }catch(err){alert(err.message||err)}
+};
+
+$("folderBtn").onclick=async()=>{
+  if(!window.showDirectoryPicker){
+    alert("このブラウザではフォルダ選択機能が利用できません。Chrome / Edgeの最新版で開いてください。");
+    return;
+  }
+  try{
+    directoryHandle=await window.showDirectoryPicker({mode:"read"});
+    await scanDirectory(directoryHandle);
+  }catch(err){
+    if(err.name!=="AbortError")alert(err.message||err);
+  }
+};
+
+async function sha256(blob){
+  const buf=await blob.arrayBuffer();
   const hash=await crypto.subtle.digest("SHA-256",buf);
   return [...new Uint8Array(hash)].map(x=>x.toString(16).padStart(2,"0")).join("");
 }
-async function addCover(file){
-  if(!file || !file.type.startsWith("image/")) return;
-  cover={file, hash:await sha256(file)};
-  $("coverInfo").textContent=file.name;
-  const url=URL.createObjectURL(file);
-  $("coverPreview").innerHTML=`<img src="${url}" style="width:140px;aspect-ratio:2/3;object-fit:contain;background:#eee;border:1px solid #ddd;border-radius:8px">`;
+async function pngFile(file){
+  if(file.type==="image/png")return file;
+  const bmp=await createImageBitmap(file);
+  const canvas=document.createElement("canvas");
+  canvas.width=bmp.width;canvas.height=bmp.height;
+  canvas.getContext("2d").drawImage(bmp,0,0);
+  return await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
 }
-async function addCards(files){
-  for(const file of files){
-    if(!file.type.startsWith("image/")) continue;
-    cards.push({file, hash:await sha256(file), memo:""});
+function rid(n=20){
+  const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let s="";
+  const a=new Uint32Array(n);
+  crypto.getRandomValues(a);
+  for(const v of a)s+=chars[v%chars.length];
+  return s;
+}
+
+async function exportDeck(){
+  if(!selected.size){alert("デッキに入れるカードを選択してください。");return}
+  const chosen=[];
+  for(const [i,q] of selected){
+    const r=rows[i];
+    if(!r.image){
+      alert(`カードNo「${r.no}」の画像が見つかりません。\\n画像ファイル名は「${r.no}.png」などにしてください。`);
+      return;
+    }
+    chosen.push({r,q});
   }
-  render();
-}
-function render(){
-  $("stats").textContent=`カード：${cards.length}枚`;
-  $("cards").innerHTML="";
-  cards.forEach((c,i)=>{
-    const el=document.createElement("div");
-    el.className="card";
-    const url=URL.createObjectURL(c.file);
-    el.innerHTML=`
-      <button class="remove" title="削除">×</button>
-      <img src="${url}">
-      <div class="body">
-        <div style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(c.file.name)}</div>
-        <input type="text" placeholder="カードメモ（任意）" value="${escapeAttr(c.memo)}">
-      </div>`;
-    el.querySelector(".remove").onclick=()=>{cards.splice(i,1);render()};
-    el.querySelector("input").oninput=e=>c.memo=e.target.value;
-    $("cards").appendChild(el);
-  });
-}
-function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-function escapeAttr(s){return escapeHtml(s)}
-
-function setupDrop(drop,input,handler){
-  drop.onclick=()=>input.click();
-  input.onchange=e=>handler([...e.target.files]);
-  ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));
-  ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));
-  drop.addEventListener("drop",e=>handler([...e.dataTransfer.files]));
-}
-setupDrop($("coverDrop"),$("coverInput"),files=>files[0]&&addCover(files[0]));
-setupDrop($("cardDrop"),$("cardInput"),addCards);
-
-$("sortBtn").onclick=()=>{
-  cards.sort((a,b)=>a.file.name.localeCompare(b.file.name,"ja"));
-  render();
-};
-$("clearBtn").onclick=()=>{
-  if(confirm("カードをすべて削除しますか？")){cards.length=0;render();}
-};
-
-$("exportBtn").onclick=async()=>{
-  if(!cover){alert("デッキの裏面画像を設定してください。");return}
-  if(!cards.length){alert("カード画像を1枚以上登録してください。");return}
 
   const zip=new JSZip();
   const resource={};
-  const deckId=randomId();
-  const deckItems={};
+  const items={};
 
-  // ココフォリアのサンプルデータに合わせ、PNG化した実体のSHA-256をファイル名にする
-  const coverPng=await normalizePng(cover.file);
-  const coverHash=await sha256(coverPng);
+  // 「カード背面」は、表カード・裏カードとは別の固定画像を使用。
+  const coverSource=imageFiles.get(norm(COVER_IMAGE_FILENAME));
+  if(!coverSource){
+    alert(`カード背面画像「${COVER_IMAGE_FILENAME}」が見つかりません。\nExcel・HTMLと同じフォルダに配置してください。`);
+    return;
+  }
+  const cover=await pngFile(coverSource);
+  const coverHash=await sha256(cover);
   const coverName=coverHash+".png";
-  zip.file(coverName,coverPng);
+  zip.file(coverName,cover);
   resource[coverName]={type:"image/png"};
 
-  for(const c of cards){
-    const png=await normalizePng(c.file);
+  for(const {r,q} of chosen){
+    const png=await pngFile(r.image);
     const hash=await sha256(png);
     const name=hash+".png";
-    zip.file(name,png);
-    resource[name]={type:"image/png"};
-    const itemId=randomId();
-    deckItems[itemId]={imageUrl:name,memo:c.memo||""};
+    if(!resource[name]){
+      zip.file(name,png);
+      resource[name]={type:"image/png"};
+    }
+    const memo=makeMemo(r);
+    for(let n=0;n<q;n++){
+      items[rid()]={imageUrl:name,memo};
+    }
   }
 
+  const deckId=rid();
   const data={
     meta:{version:"1.1.0"},
     entities:{
@@ -208,10 +461,10 @@ $("exportBtn").onclick=async()=>{
       decks:{
         [deckId]:{
           x:-10,y:-8,z:99,
-          width:Number($("width").value)||2,
-          height:Number($("height").value)||3,
+          width:Number($("deckWidth").value)||2,
+          height:Number($("deckHeight").value)||3,
           coverImageUrl:coverName,
-          items:deckItems
+          items
         }
       },
       notes:{},characters:{},effects:{},scenes:{},savedatas:{},snapshots:{}
@@ -219,32 +472,21 @@ $("exportBtn").onclick=async()=>{
     resources:resource
   };
 
-  // __data.json はサンプルと同じく改行・インデントなしで保存
   const dataText=JSON.stringify(data);
   zip.file("__data.json",dataText);
-
-  // .token は「0.」+ __data.json のSHA-256
-  const tokenHash=await sha256(new Blob([dataText]));
-  zip.file(".token","0."+tokenHash);
+  zip.file(".token","0."+await sha256(new Blob([dataText])));
 
   const blob=await zip.generateAsync({type:"blob",compression:"DEFLATE"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
-  const safe=($("deckName").value||"my_deck").replace(/[\\/:*?"<>|]/g,"_");
-  a.download=safe+".zip";
+  a.download=(($("deckName").value||"ココフォリアデッキ").replace(/[\\\\/:*?"<>|]/g,"_"))+".zip";
   a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
-};
-
-async function normalizePng(file){
-  if(file.type==="image/png") return file;
-  const bmp=await createImageBitmap(file);
-  const canvas=document.createElement("canvas");
-  canvas.width=bmp.width;canvas.height=bmp.height;
-  canvas.getContext("2d").drawImage(bmp,0,0);
-  return new Promise(r=>canvas.toBlob(r,"image/png"));
+  setTimeout(()=>URL.revokeObjectURL(a.href),3000);
 }
-render();
+
+$("exportBtn").onclick=async()=>{
+  try{await exportDeck()}catch(e){console.error(e);alert("書き出しに失敗しました。\\n"+(e.message||e))}
+};
 </script>
 </body>
 </html>
