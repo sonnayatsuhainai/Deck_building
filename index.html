@@ -357,7 +357,7 @@ function render(){
       <td>${esc(r.affiliation)}</td><td>${esc(r.type)}</td><td>${esc(r.attribute)}</td>
       <td>${esc(r.cost)}</td><td>${esc(r.link)}</td><td>${esc(r.power)}</td>
       <td>${esc(r.effect).replace(/\\n/g,"<br>")}</td><td>${img}</td>
-      <td class="qty"><input type="number" min="0" max="3" value="${qty}" data-qty="${i}"></td>
+      <td class="qty"><input type="number" min="0" max="4" value="${qty}" data-qty="${i}"></td>
       <td class="memo">${esc(makeMemo(r)).replace(/\\n/g,"<br>")}</td></tr>`;
   }
   html+='</tbody></table></div>';
@@ -370,7 +370,7 @@ function render(){
     render();updateStats();renderSelectedDeck();
   });
   $("cardsPanel").querySelectorAll("[data-qty]").forEach(el=>el.onchange=()=>{
-    const i=Number(el.dataset.qty),r=rows[i],key=cardKey(r),q=Math.max(0,Math.min(3,Number(el.value)||0));
+    const i=Number(el.dataset.qty),r=rows[i],key=cardKey(r),q=Math.max(0,Math.min(4,Number(el.value)||0));
     if(q)selectedCards.set(key,{key,quantity:q,card:{...r,sheet:currentSheetName}});
     else selectedCards.delete(key);
     render();updateStats();renderSelectedDeck();
@@ -415,7 +415,7 @@ function renderSelectedDeck(){
   const entries=[...selectedCards.values()];
   if(!entries.length){panel.innerHTML='<div class="empty">まだカードが選択されていません。</div>';return;}
   panel.innerHTML=`<div class="table-wrap"><table><thead><th>カード名</th><th>種類</th><th>表/裏</th><th>所属</th><th>属性</th><th>枚数</th><th>操作</th></tr></thead><tbody>
-  ${entries.map(e=>`<tr><td><b>${esc(e.card.name)}</b></td><td>${esc(e.card.kind)}</td><td>${esc(e.card.side)}</td><td>${esc(e.card.affiliation)}</td><td>${esc(e.card.attribute)}</td><td><input type="number" min="1" max="3" value="${e.quantity}" data-sqty="${esc(e.key)}" style="width:65px"></td><td><button class="danger" data-remove="${esc(e.key)}">削除</button></td></tr>`).join("")}
+  ${entries.map(e=>`<tr><td><b>${esc(e.card.name)}</b></td><td>${esc(e.card.kind)}</td><td>${esc(e.card.side)}</td><td>${esc(e.card.affiliation)}</td><td>${esc(e.card.attribute)}</td><td><input type="number" min="1" max="4" value="${e.quantity}" data-sqty="${esc(e.key)}" style="width:65px"></td><td><button class="danger" data-remove="${esc(e.key)}">削除</button></td></tr>`).join("")}
   </tbody></table></div>`;
   panel.querySelectorAll("[data-sqty]").forEach(el=>el.onchange=()=>{
     const e=selectedCards.get(el.dataset.sqty);if(!e)return;
