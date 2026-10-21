@@ -136,7 +136,7 @@ small{color:#777}
     </div>
   </div>
   <p class="notice">
-    カードは1種類につき<strong>最大3枚</strong>まで選択できます。<br>
+    カードは1種類につき<strong>最大4枚</strong>まで選択できます。<br>
     メモは「カード名(表/裏・カード種類)」＋「効果：」＋Excelの効果欄という形式で自動生成します。
   </p>
 </section>
@@ -419,7 +419,7 @@ function renderSelectedDeck(){
   </tbody></table></div>`;
   panel.querySelectorAll("[data-sqty]").forEach(el=>el.onchange=()=>{
     const e=selectedCards.get(el.dataset.sqty);if(!e)return;
-    e.quantity=Math.max(1,Math.min(3,Number(el.value)||1));renderSelectedDeck();updateStats();render();
+    e.quantity=Math.max(1,Math.min(4,Number(el.value)||1));renderSelectedDeck();updateStats();render();
   });
   panel.querySelectorAll("[data-remove]").forEach(el=>el.onclick=()=>{
     selectedCards.delete(el.dataset.remove);renderSelectedDeck();updateStats();render();
