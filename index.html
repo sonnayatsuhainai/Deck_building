@@ -26,8 +26,67 @@ button{border:0;border-radius:7px;padding:9px 13px;font-weight:700;cursor:pointe
 .deckinfo b{color:#222}
 .table-wrap{overflow:auto;border:1px solid #ddd;border-radius:9px}
 table{border-collapse:collapse;width:100%;min-width:900px}
+/* カード一覧：枚数を先頭に配置し、必要以上に横幅を広げない */
+.card-list-table{table-layout:fixed;width:1515px;min-width:1515px}
+.card-list-table th,.card-list-table td{overflow-wrap:break-word;word-break:normal}
+.card-list-table th{white-space:nowrap}
+.card-list-table th:nth-child(1),.card-list-table td:nth-child(1){width:70px;min-width:70px}
+.card-list-table th:nth-child(2),.card-list-table td:nth-child(2){width:65px;min-width:65px}
+.card-list-table th:nth-child(3),.card-list-table td:nth-child(3){width:180px;min-width:180px}
+.card-list-table th:nth-child(4),.card-list-table td:nth-child(4){width:95px;min-width:95px}
+.card-list-table th:nth-child(5),.card-list-table td:nth-child(5){width:55px;min-width:55px}
+.card-list-table th:nth-child(6),.card-list-table td:nth-child(6){width:110px;min-width:110px}
+.card-list-table th:nth-child(7),.card-list-table td:nth-child(7){width:100px;min-width:100px}
+.card-list-table th:nth-child(8),.card-list-table td:nth-child(8){width:65px;min-width:65px}
+.card-list-table th:nth-child(9),.card-list-table td:nth-child(9){width:55px;min-width:55px}
+.card-list-table th:nth-child(10),.card-list-table td:nth-child(10){width:85px;min-width:85px}
+.card-list-table th:nth-child(11),.card-list-table td:nth-child(11){width:65px;min-width:65px}
+.card-list-table th:nth-child(12),.card-list-table td:nth-child(12){width:260px;min-width:260px}
+.card-list-table th:nth-child(13),.card-list-table td:nth-child(13){width:70px;min-width:70px}
+.card-list-table th:nth-child(14),.card-list-table td:nth-child(14){width:280px;min-width:280px}
+.card-list-table td:nth-child(3),
+.card-list-table td:nth-child(4),
+.card-list-table td:nth-child(5),
+.card-list-table td:nth-child(6),
+.card-list-table td:nth-child(7),
+.card-list-table td:nth-child(8),
+.card-list-table td:nth-child(9),
+.card-list-table td:nth-child(10),
+.card-list-table td:nth-child(11){white-space:normal;line-height:1.45}
+.card-list-table td:nth-child(12),
+.card-list-table td:nth-child(14){white-space:normal;line-height:1.55}
+.card-list-table td:nth-child(1),
+.card-list-table td:nth-child(2),
+.card-list-table td:nth-child(13){text-align:center}
+@media(max-width:700px){
+  .card-list-table{width:1515px;min-width:1515px}
+}
+.selected-deck-wrap{width:100%;max-width:100%;overflow-x:auto}
+.selected-deck-table{width:100%;min-width:0;table-layout:fixed}
+.selected-deck-table th,.selected-deck-table td{padding:8px 7px;overflow-wrap:anywhere;word-break:break-word}
+.selected-deck-table th:nth-child(1){width:27%}
+.selected-deck-table th:nth-child(2){width:13%}
+.selected-deck-table th:nth-child(3){width:9%}
+.selected-deck-table th:nth-child(4){width:20%}
+.selected-deck-table th:nth-child(5){width:12%}
+.selected-deck-table th:nth-child(6){width:10%}
+.selected-deck-table th:nth-child(7){width:9%}
+.selected-deck-table td:nth-child(6){text-align:center}
+.selected-deck-table td:nth-child(7){text-align:center}
+.selected-deck-table td:nth-child(6) input{max-width:100%;width:58px!important}
+.selected-deck-table td:nth-child(7) button{padding:7px 8px;white-space:nowrap}
+@media(max-width:600px){
+  .selected-deck-table th,.selected-deck-table td{padding:7px 4px;font-size:11px}
+  .selected-deck-table td:nth-child(6) input{width:45px!important}
+  .selected-deck-table td:nth-child(7) button{padding:6px 5px;font-size:11px}
+}
 th,td{padding:9px 10px;border-bottom:1px solid #e5e5e5;text-align:left;vertical-align:middle}
 th{background:#f7f7f8;position:sticky;top:0;z-index:2;font-size:12px}
+th.sortable{cursor:pointer;user-select:none;white-space:nowrap}
+th.sortable:hover{background:#e8ebef}
+th.sortable::after{content:" ↕";color:#999;font-size:10px}
+th.sort-asc::after{content:" ▲";color:#222}
+th.sort-desc::after{content:" ▼";color:#222}
 td{font-size:13px}
 tr.selected{background:#f5f8ff}
 .no{width:70px;text-align:center}.qty{width:80px}.pick{width:55px;text-align:center}
@@ -40,7 +99,7 @@ tr.selected{background:#f5f8ff}
 small{color:#777}
 .notice{font-size:13px;line-height:1.7;color:#555}
 /* スクロール中も常に表示する枚数カウンター */
-.sticky-counts{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(255,255,255,.97);border-top:2px solid #222;box-shadow:0 -4px 16px rgba(0,0,0,.12);padding:14px 12px;backdrop-filter:blur(8px)}
+.sticky-counts{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(255,255,255,.97);border-top:2px solid #222;box-shadow:0 -4px 16px rgba(0,0,0,.12);padding:8px 12px;backdrop-filter:blur(8px)}
 .sticky-counts-inner{max-width:1250px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:8px 24px;flex-wrap:wrap}
 .count-item{display:flex;align-items:baseline;gap:6px;font-size:12px;color:#555;white-space:nowrap}
 .count-item strong{font-size:19px;line-height:1;color:#222;font-variant-numeric:tabular-nums}
@@ -96,10 +155,10 @@ small{color:#777}
     <div style="min-width:150px">
       <select id="typeFilter"><option value="">カード種類：すべて</option></select>
     </div>
-    <div style="min-width:150px">
+    <div style="min-width:170px">
       <select id="sideFilter"><option value="">表/裏：すべて</option></select>
     </div>
-    <div style="min-width:150px">
+    <div style="min-width:170px">
       <select id="affiliationFilter"><option value="">所属：すべて</option></select>
     </div>
     <button class="sub" id="resetBtn">選択解除</button>
@@ -133,10 +192,11 @@ small{color:#777}
     </div>
     <div>
       <button class="primary" id="exportBtn">ココフォリア用ZIPを書き出す</button>
+      <button class="sub" id="exportTextBtn">デッキのテキストを書き出す</button>
     </div>
   </div>
   <p class="notice">
-    カードは1種類につき<strong>最大4枚</strong>まで選択できます。<br>
+    カードは1種類につき<strong>最大3枚</strong>まで選択できます。<br>☆カードはデッキ全体で<strong>合計10枚まで</strong>です。<br>
     メモは「カード名(表/裏・カード種類)」＋「効果：」＋Excelの効果欄という形式で自動生成します。
   </p>
 </section>
@@ -148,7 +208,6 @@ small{color:#777}
     <div class="count-item"><span>裏</span><strong id="footerBackCount">0</strong><span class="target">枚</span></div>
     <div class="count-item total"><span>合計</span><strong id="footerTotalCount">0</strong><span class="target">枚</span></div>
     <div class="count-item special"><span>☆カード</span><strong id="footerStarCount">0</strong><span class="target">枚</span></div>
-    <br>
     <div class="count-item attribute-fire"><span>火</span><strong id="footerAttrFire">0</strong></div>
     <div class="count-item attribute-water"><span>水</span><strong id="footerAttrWater">0</strong></div>
     <div class="count-item attribute-air"><span>空気</span><strong id="footerAttrAir">0</strong></div>
@@ -176,6 +235,7 @@ let currentSheetName="";
 let selectedCards=new Map(); // selection persists across sheets
 let imageFiles=new Map(); // normalized filename -> File
 let directoryHandle=null;
+let sortState={key:"no",direction:"asc"};
 
 const $=id=>document.getElementById(id);
 
@@ -325,7 +385,7 @@ function filteredRows(){
   const type=$("typeFilter").value;
   const side=$("sideFilter").value;
   const affiliation=$("affiliationFilter").value;
-  return rows.map((r,i)=>({r,i})).filter(({r})=>{
+  const list=rows.map((r,i)=>({r,i})).filter(({r})=>{
     if(type&&r.kind!==type)return false;
     if(side&&r.side!==side)return false;
     if(affiliation&&r.affiliation!==affiliation)return false;
@@ -335,9 +395,31 @@ function filteredRows(){
     }
     return true;
   });
+  const key=sortState.key;
+  const direction=sortState.direction==="asc"?1:-1;
+  list.sort((a,b)=>{
+    const av=clean(a.r[key]),bv=clean(b.r[key]);
+    const an=Number(av),bn=Number(bv);
+    const bothNumeric=av!==""&&bv!==""&&Number.isFinite(an)&&Number.isFinite(bn);
+    let cmp=bothNumeric?(an-bn):av.localeCompare(bv,"ja",{numeric:true,sensitivity:"base"});
+    if(cmp===0)cmp=a.i-b.i;
+    return cmp*direction;
+  });
+  return list;
 }
 
 function cardKey(r){ return `${currentSheetName}::${r.no}::${r.name}`; }
+
+function isStarCard(card){
+  return String(card?.name||"").includes("☆");
+}
+function getStarCount(excludeKey=null){
+  let count=0;
+  for(const [key,entry] of selectedCards){
+    if(key!==excludeKey && isStarCard(entry.card)) count+=entry.quantity;
+  }
+  return count;
+}
 
 function render(){
   if(!rows.length){
@@ -345,32 +427,52 @@ function render(){
     return;
   }
   const list=filteredRows();
-  let html=`<div class="table-wrap"><table>
-  <thead><tr><th class="pick">選択</th><th class="no">カードNo</th><th>カード名</th><th>カード種類</th><th>表/裏</th><th>所属</th><th>タイプ</th><th>属性</th><th>コスト</th><th>リンク/パス</th><th>パワー</th><th>効果</th><th>画像</th><th class="qty">枚数</th><th>メモ</th></tr></thead><tbody>`;
+  const sortHeaders=[
+    ["no","カードNo","no"],["name","カード名",""],["kind","カード種類",""],["side","表/裏",""],
+    ["affiliation","所属",""],["type","タイプ",""],["attribute","属性",""],["cost","コスト",""],
+    ["link","リンク/パス",""],["power","パワー",""],["effect","効果",""]
+  ];
+  const headerHtml=`<th class="qty">枚数</th>`+sortHeaders.map(([key,label,cls])=>{
+    const active=sortState.key===key?(sortState.direction==="asc"?" sort-asc":" sort-desc"):"";
+    return `<th class="sortable${active}${cls?" "+cls:""}" data-sort="${key}" tabindex="0" role="button" aria-label="${label}でソート">${label}</th>`;
+  }).join("")+`<th>画像</th><th>メモ</th>`;
+  let html=`<div class="table-wrap"><table class="card-list-table">
+  <thead><tr>${headerHtml}</tr></thead><tbody>`;
   for(const {r,i} of list){
     const key=cardKey(r), entry=selectedCards.get(key), qty=entry?.quantity||0;
     const img=r.image?`<img class="preview-img" src="${URL.createObjectURL(r.image)}">`:`<span class="image-ng">未読込</span>`;
     html+=`<tr class="${qty?"selected":""}">
-      <td class="pick"><input type="checkbox" data-pick="${i}" ${qty?"checked":""}></td>
+      <td class="qty"><input type="number" min="0" max="3" value="${qty}" data-qty="${i}"></td>
       <td class="no">${esc(r.no)}</td><td><b>${esc(r.name)}</b></td>
       <td><span class="badge">${esc(r.kind)}</span></td><td>${esc(r.side)}</td>
       <td>${esc(r.affiliation)}</td><td>${esc(r.type)}</td><td>${esc(r.attribute)}</td>
       <td>${esc(r.cost)}</td><td>${esc(r.link)}</td><td>${esc(r.power)}</td>
       <td>${esc(r.effect).replace(/\\n/g,"<br>")}</td><td>${img}</td>
-      <td class="qty"><input type="number" min="0" max="4" value="${qty}" data-qty="${i}"></td>
       <td class="memo">${esc(makeMemo(r)).replace(/\\n/g,"<br>")}</td></tr>`;
   }
   html+='</tbody></table></div>';
   if(!list.length)html='<div class="empty">条件に一致するカードがありません。</div>';
   $("cardsPanel").innerHTML=html;
-  $("cardsPanel").querySelectorAll("[data-pick]").forEach(el=>el.onchange=()=>{
-    const i=Number(el.dataset.pick),r=rows[i],key=cardKey(r);
-    if(el.checked)selectedCards.set(key,{key,quantity:Math.max(1,selectedCards.get(key)?.quantity||1),card:{...r,sheet:currentSheetName}});
-    else selectedCards.delete(key);
-    render();updateStats();renderSelectedDeck();
+  $("cardsPanel").querySelectorAll("[data-sort]").forEach(el=>{
+    const changeSort=()=>{
+      const key=el.dataset.sort;
+      if(sortState.key===key) sortState.direction=sortState.direction==="asc"?"desc":"asc";
+      else {sortState.key=key;sortState.direction="asc";}
+      render();
+    };
+    el.onclick=changeSort;
+    el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();changeSort();}};
   });
   $("cardsPanel").querySelectorAll("[data-qty]").forEach(el=>el.onchange=()=>{
-    const i=Number(el.dataset.qty),r=rows[i],key=cardKey(r),q=Math.max(0,Math.min(4,Number(el.value)||0));
+    const i=Number(el.dataset.qty),r=rows[i],key=cardKey(r);
+    let q=Math.max(0,Math.min(3,Number(el.value)||0));
+    if(isStarCard(r)){
+      const allowed=Math.max(0,10-getStarCount(key));
+      if(q>allowed){
+        alert("☆カードはデッキ全体で合計10枚までです。入力枚数を調整しました。");
+        q=allowed;
+      }
+    }
     if(q)selectedCards.set(key,{key,quantity:q,card:{...r,sheet:currentSheetName}});
     else selectedCards.delete(key);
     render();updateStats();renderSelectedDeck();
@@ -399,6 +501,7 @@ function updateStats(){
   $("footerBackCount").textContent=back;
   $("footerTotalCount").textContent=total;
   $("footerStarCount").textContent=star;
+  $("footerStarCount").style.color=star>10?"#b42318":"#222";
   $("footerAttrFire").textContent=attrCounts["火"];
   $("footerAttrWater").textContent=attrCounts["水"];
   $("footerAttrAir").textContent=attrCounts["空気"];
@@ -414,12 +517,30 @@ function renderSelectedDeck(){
   const panel=$("selectedDeckPanel"); if(!panel)return;
   const entries=[...selectedCards.values()];
   if(!entries.length){panel.innerHTML='<div class="empty">まだカードが選択されていません。</div>';return;}
-  panel.innerHTML=`<div class="table-wrap"><table><thead><th>カード名</th><th>種類</th><th>表/裏</th><th>所属</th><th>属性</th><th>枚数</th><th>操作</th></tr></thead><tbody>
-  ${entries.map(e=>`<tr><td><b>${esc(e.card.name)}</b></td><td>${esc(e.card.kind)}</td><td>${esc(e.card.side)}</td><td>${esc(e.card.affiliation)}</td><td>${esc(e.card.attribute)}</td><td><input type="number" min="1" max="4" value="${e.quantity}" data-sqty="${esc(e.key)}" style="width:65px"></td><td><button class="danger" data-remove="${esc(e.key)}">削除</button></td></tr>`).join("")}
+  panel.innerHTML=`<div class="selected-deck-wrap"><table class="selected-deck-table"><thead><tr>
+    <th>カード名</th><th>種類</th><th>表/裏</th><th>所属</th><th>属性</th><th>枚数</th><th>操作</th>
+  </tr></thead><tbody>
+  ${entries.map(e=>`<tr>
+    <td><b>${esc(e.card.name)}</b></td>
+    <td>${esc(e.card.kind)}</td>
+    <td>${esc(e.card.side)}</td>
+    <td>${esc(e.card.affiliation)}</td>
+    <td>${esc(e.card.attribute)}</td>
+    <td><input type="number" min="1" max="3" value="${e.quantity}" data-sqty="${esc(e.key)}"></td>
+    <td><button class="danger" data-remove="${esc(e.key)}">削除</button></td>
+  </tr>`).join("")}
   </tbody></table></div>`;
   panel.querySelectorAll("[data-sqty]").forEach(el=>el.onchange=()=>{
-    const e=selectedCards.get(el.dataset.sqty);if(!e)return;
-    e.quantity=Math.max(1,Math.min(4,Number(el.value)||1));renderSelectedDeck();updateStats();render();
+    const key=el.dataset.sqty,e=selectedCards.get(key);if(!e)return;
+    let q=Math.max(1,Math.min(3,Number(el.value)||1));
+    if(isStarCard(e.card)){
+      const allowed=Math.max(0,10-getStarCount(key));
+      if(q>allowed){
+        alert("☆カードはデッキ全体で合計10枚までです。入力枚数を調整しました。");
+        q=Math.max(1,allowed);
+      }
+    }
+    e.quantity=q;renderSelectedDeck();updateStats();render();
   });
   panel.querySelectorAll("[data-remove]").forEach(el=>el.onclick=()=>{
     selectedCards.delete(el.dataset.remove);renderSelectedDeck();updateStats();render();
@@ -479,6 +600,41 @@ function rid(n=20){
   return s;
 }
 
+function exportDeckText(){
+  if(!selectedCards.size){
+    alert("デッキに入れるカードを選択してください。");
+    return;
+  }
+
+  const entries=[...selectedCards.values()];
+  const total=entries.reduce((sum,e)=>sum+e.quantity,0);
+  const lines=[
+    `デッキ名：${$("deckName").value||"マイデッキ"}`,
+    `カード種類数：${entries.length}`,
+    `デッキ枚数：${total}`,
+    "",
+    "========================================",
+    ""
+  ];
+
+  entries.forEach((e,index)=>{
+    lines.push(`【${index+1}】${e.card.name} × ${e.quantity}枚`);
+    lines.push(`シート：${e.card.sheet}`);
+    lines.push(makeMemo(e.card));
+    lines.push("");
+    lines.push("----------------------------------------");
+    lines.push("");
+  });
+
+  const blob=new Blob(["\uFEFF"+lines.join("\r\n")],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=(($("deckName").value||"デッキ").replace(/[\\/:*?"<>|]/g,"_"))+".txt";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+}
+
 async function exportDeck(){
   if(!selectedCards.size){alert("デッキに入れるカードを選択してください。");return}
   const chosen=[...selectedCards.values()].map(e=>({r:e.card,q:e.quantity}));
@@ -508,6 +664,9 @@ async function exportDeck(){
 }
 $("exportBtn").onclick=async()=>{
   try{await exportDeck()}catch(e){console.error(e);alert("書き出しに失敗しました。\\n"+(e.message||e))}
+};
+$("exportTextBtn").onclick=()=>{
+  try{exportDeckText()}catch(e){console.error(e);alert("テキストの書き出しに失敗しました。\\n"+(e.message||e))}
 };
 </script>
 </body>
